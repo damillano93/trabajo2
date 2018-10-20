@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/dt-1.10.9/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/r/dt/dt-1.10.9/datatables.min.js"></script>
+    <title>trabajo 2 herramientas </title>
+</head>
+
+<body>
+
+    <div class="container" style="padding:50px 250px;">
+        <div class="alert alert-success">
+            <h1>herramientas</h1>
+        </div>
+        <button type="button" onclick="datos()">descargar</button>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript">
+ 
+//var edad;
+//var sexo;
+//var diagnostico = "";
+
+//var paciente = "I01"
+var dat ="";
+
+function cabecera(paciente){
+    var intervalo="";
+    $.ajax({
+        url: 'https://www.physionet.org/atm/ltstdb/'+paciente+'/description/record.txt',
+        method: 'GET',
+        xhrFields: {
+            responseType: 'text/plain'
+        },
+        success: function (data) {
+            var descrpcion = data.split("\n");
+           
+            var datos = descrpcion[3].split(" ");
+            console.log(datos)
+            var edad = datos[1];
+            var sexo = datos[4];
+            var diagnostico = "";
+            for(i=5;i<datos.length;i++){
+
+              diagnostico = diagnostico + datos[i] + " "
+            }
+
+            //console.log("la edad es: "+edad+" el sexo es: "+sexo+" el diagnostico es: "+diagnostico)
+            //dat =[edad,sexo,diagnostico];
+           // console.log(dat)
+           
+
+            $.ajax({
+        url: 'https://www.physionet.org/atm/ltstdb/'+paciente+'/atr/0/e/rr/t/rr.txt',
+        method: 'GET',
+        xhrFields: {
+            responseType: 'text/plain'
+        },
+        success: function (data2) {
+           
+            var RR = data2.split("\n");
+           // console.log("los datos son:")
+            
+            for(i=0;i<RR.length-1;i++){
+                var ECG = RR[i].split("\t");
+                 datos[i] =  ECG[2] 
+                intervalo =  intervalo + paciente + "," + ECG[2] + "," + edad+ "," + sexo +"," + diagnostico +"\n"
+            }
+             // console.log(intervalo)
+
+             dat = dat + intervalo; 
+           
+           
+             
+              var a = document.createElement("a");
+        var file = new Blob([intervalo], { type: 'text/plain' });
+        a.href = URL.createObjectURL(file);
+        a.download = paciente+".csv";
+        a.click();
+        console.log("el paciente es: ", paciente)
+         
+        //console.log(dat)
+        
+        
+        }
+    });
+        }
+    });
+    
+}
+
+
+
+
+
+
+function datos(){
+cabecera("s20011")
+
+
+
+
+   
+}
+
+
+
+//console.log(intervalo)
+
+</script>
